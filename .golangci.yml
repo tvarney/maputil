@@ -87,6 +87,7 @@ issues:
       # Turn off the following linters for all test files
       linters:
         - dupl
+        - exhaustivestruct
         - lll
         - funlen
         - errcheck
