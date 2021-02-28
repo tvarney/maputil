@@ -476,6 +476,13 @@ func TestAsNumber(t *testing.T) {
 			require.NoError(t, err)
 			require.Equal(t, float64(10.5), i)
 		})
+		t.Run("BadValue", func(t *testing.T) {
+			t.Parallel()
+			var data interface{} = json.Number("invalid")
+			i, err := maputil.AsNumber(data)
+			require.Error(t, err)
+			require.Zero(t, i)
+		})
 	})
 	t.Run("BadType", func(t *testing.T) {
 		t.Parallel()
