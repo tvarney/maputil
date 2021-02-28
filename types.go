@@ -85,14 +85,6 @@ func Is(v interface{}, types ...string) error {
 		if t == TypeNumber && typename == TypeInteger {
 			return nil
 		}
-		// If we accept an Integer and the type given is a Number, check if it
-		// has no fractional part.
-		if t == TypeInteger && typename == TypeNumber {
-			f, _ := AsNumber(v)
-			if math.Trunc(f) == f {
-				return nil
-			}
-		}
 	}
 
 	return InvalidTypeError{
