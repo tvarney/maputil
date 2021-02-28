@@ -197,7 +197,7 @@ func PopStringEnum(m map[string]interface{}, key string, values []string) (strin
 			return s, true, nil
 		}
 	}
-	return s, false, EnumStringError{
+	return s, true, EnumStringError{
 		Value: s,
 		Enum:  values,
 	}
