@@ -92,3 +92,4 @@ issues:
         - funlen
         - errcheck
         - goerr113
+        - goconst
