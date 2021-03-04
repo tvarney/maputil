@@ -93,3 +93,4 @@ issues:
         - errcheck
         - goerr113
         - goconst
+        - gofumpt

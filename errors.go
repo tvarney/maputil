@@ -3,22 +3,16 @@ package maputil
 import (
 	"fmt"
 	"strings"
+
+	"github.com/tvarney/maputil/consterr"
 )
-
-// ConstError is a constant error type.
-type ConstError string
-
-// Error returns the string value of the constant error.
-func (e ConstError) Error() string {
-	return string(e)
-}
 
 const (
 	// ErrInvalidType is the root type error.
-	ErrInvalidType ConstError = "invalid type"
+	ErrInvalidType consterr.Error = "invalid type"
 
 	// ErrInvalidValue is the root value error.
-	ErrInvalidValue ConstError = "invalid value"
+	ErrInvalidValue consterr.Error = "invalid value"
 )
 
 // InvalidTypeError is an error indicating that a type did not match the
