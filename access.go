@@ -202,3 +202,95 @@ func PopStringEnum(m map[string]interface{}, key string, values []string) (strin
 		Enum:  values,
 	}
 }
+
+// RequireArray fetches a value from the map and converts it to an array.
+func RequireArray(m map[string]interface{}, key string) ([]interface{}, error) {
+	v, ok := m[key]
+	if !ok {
+		return nil, MissingRequiredValueError{Key: key}
+	}
+	return AsArray(v)
+}
+
+// RequireBoolean fetches a value from the map and converts it to a boolean.
+func RequireBoolean(m map[string]interface{}, key string) (bool, error) {
+	v, ok := m[key]
+	if !ok {
+		return false, MissingRequiredValueError{Key: key}
+	}
+	return AsBoolean(v)
+}
+
+// RequireInteger fetches a value from the map and converts it to an integer.
+func RequireInteger(m map[string]interface{}, key string) (int64, error) {
+	v, ok := m[key]
+	if !ok {
+		return 0, MissingRequiredValueError{Key: key}
+	}
+	return AsInteger(v)
+}
+
+// RequireNull fetches a value from the map and ensures it was null.
+func RequireNull(m map[string]interface{}, key string) error {
+	v, ok := m[key]
+	if !ok {
+		return MissingRequiredValueError{Key: key}
+	}
+	if v != nil {
+		return InvalidTypeError{
+			Expected: []string{TypeNull},
+			Actual:   TypeName(v),
+		}
+	}
+	return nil
+}
+
+// RequireNumber fetches a value from the map and converts it to a number.
+func RequireNumber(m map[string]interface{}, key string) (float64, error) {
+	v, ok := m[key]
+	if !ok {
+		return 0, MissingRequiredValueError{Key: key}
+	}
+	return AsNumber(v)
+}
+
+// RequireObject fetches a value from the map and converts it to an object.
+func RequireObject(m map[string]interface{}, key string) (map[string]interface{}, error) {
+	v, ok := m[key]
+	if !ok {
+		return nil, MissingRequiredValueError{Key: key}
+	}
+	return AsObject(v)
+}
+
+// RequireString fetches a value from the map and converts it to a string.
+func RequireString(m map[string]interface{}, key string) (string, error) {
+	v, ok := m[key]
+	if !ok {
+		return "", MissingRequiredValueError{Key: key}
+	}
+	return AsString(v)
+}
+
+// RequireStringEnum fetches a value from the map, converts it to a string, and
+// ensures it is one of the given values.
+func RequireStringEnum(m map[string]interface{}, key string, values []string) (string, error) {
+	v, ok := m[key]
+	if !ok {
+		return "", MissingRequiredValueError{Key: key}
+	}
+	s, err := AsString(v)
+	if err != nil {
+		return "", err
+	}
+
+	for _, v := range values {
+		if v == s {
+			return s, nil
+		}
+	}
+	return s, EnumStringError{
+		Value: s,
+		Enum:  values,
+	}
+}

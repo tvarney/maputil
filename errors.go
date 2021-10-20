@@ -13,6 +13,9 @@ const (
 
 	// ErrInvalidValue is the root value error.
 	ErrInvalidValue consterr.Error = "invalid value"
+
+	// ErrMissingRequiredValue is the root error of a missing required value.
+	ErrMissingRequiredValue consterr.Error = "missing required value"
 )
 
 // InvalidTypeError is an error indicating that a type did not match the
@@ -22,6 +25,7 @@ type InvalidTypeError struct {
 	Actual   string
 }
 
+// Error returns the string representation of this invalid type error.
 func (e InvalidTypeError) Error() string {
 	switch len(e.Expected) {
 	case 0:
@@ -84,4 +88,20 @@ func (e EnumStringError) Error() string {
 // Unwrap returns the parent error for this enum error.
 func (e EnumStringError) Unwrap() error {
 	return ErrInvalidValue
+}
+
+// MissingRequiredValueError is an error indicating that the given value was
+// not present.
+type MissingRequiredValueError struct {
+	Key string
+}
+
+// Error returns the string representation of this missing required value error.
+func (e MissingRequiredValueError) Error() string {
+	return fmt.Sprintf("%s %q", string(ErrMissingRequiredValue), e.Key)
+}
+
+// Unwrap returns the parent error for this missing required value error.
+func (e MissingRequiredValueError) Unwrap() error {
+	return ErrMissingRequiredValue
 }
