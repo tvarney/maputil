@@ -12,6 +12,12 @@ type ErrorHandler interface {
 	Add(*mpath.Path, error)
 }
 
+// ErrorDiscarder is an ErrorHandler which discards the error.
+type ErrorDiscarder struct{}
+
+// Add does nothing with the given error.
+func (h ErrorDiscarder) Add(p *mpath.Path, err error) {}
+
 // ErrorPrinter is an ErrorHandler which prints errors to an io.Writer.
 type ErrorPrinter struct {
 	Stream io.Writer

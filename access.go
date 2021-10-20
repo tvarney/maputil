@@ -1,5 +1,17 @@
 package maputil
 
+func CheckEnum(s string, allowed []string) error {
+	for _, v := range allowed {
+		if v == s {
+			return nil
+		}
+	}
+	return EnumStringError{
+		Value: s,
+		Enum:  allowed,
+	}
+}
+
 // GetArray fetches a value from the map and converts it to an array.
 func GetArray(m map[string]interface{}, key string) ([]interface{}, bool, error) {
 	v, ok := m[key]
@@ -87,15 +99,7 @@ func GetStringEnum(m map[string]interface{}, key string, values []string) (strin
 		return "", true, err
 	}
 
-	for _, v := range values {
-		if v == s {
-			return s, true, nil
-		}
-	}
-	return s, true, EnumStringError{
-		Value: s,
-		Enum:  values,
-	}
+	return s, true, CheckEnum(s, values)
 }
 
 // OptionalArray fetches a value from the map and converts it to an array.
@@ -202,16 +206,10 @@ func OptionalStringEnum(m map[string]interface{}, key string, values []string, d
 	if err != nil {
 		return dv, err
 	}
-
-	for _, v := range values {
-		if v == s {
-			return s, nil
-		}
+	if err := CheckEnum(s, values); err != nil {
+		return dv, err
 	}
-	return dv, EnumStringError{
-		Value: s,
-		Enum:  values,
-	}
+	return s, nil
 }
 
 // PopArray fetches a value from the map and converts it to an array.
@@ -308,15 +306,7 @@ func PopStringEnum(m map[string]interface{}, key string, values []string) (strin
 	if err != nil {
 		return "", true, err
 	}
-	for _, v := range values {
-		if v == s {
-			return s, true, nil
-		}
-	}
-	return s, true, EnumStringError{
-		Value: s,
-		Enum:  values,
-	}
+	return s, true, CheckEnum(s, values)
 }
 
 // RequireArray fetches a value from the map and converts it to an array.
@@ -400,13 +390,5 @@ func RequireStringEnum(m map[string]interface{}, key string, values []string) (s
 		return "", err
 	}
 
-	for _, v := range values {
-		if v == s {
-			return s, nil
-		}
-	}
-	return s, EnumStringError{
-		Value: s,
-		Enum:  values,
-	}
+	return s, CheckEnum(s, values)
 }
