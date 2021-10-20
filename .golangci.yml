@@ -3,10 +3,12 @@ run:
   modules-download-mode: vendor
 
 linters-settings:
+  cyclop:
+    max-complexity: 15
+    package-average: 10
+    skip-tests: true
   govet:
     check-shadowing: true
-  maligned:
-    suggest-new: true
   lll:
     line-length: 120
     tab-width: 4
@@ -15,16 +17,19 @@ linters:
   enable:
     - asciicheck
     - bodyclose
+    - cyclop
     - deadcode
     - depguard
     - dogsled
     - dupl
     - errcheck
     - errorlint
+    - errname
     - exhaustive
     - exhaustivestruct
     - exportloopref
     - forbidigo
+    - forcetypeassert
     - funlen
     - gochecknoinits
     - gci
@@ -39,29 +44,34 @@ linters:
     - gofumpt
     - goheader
     - goimports
-    - golint
+    # - golint  # deprecated
+    - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ifshort
+    - importas
     - ineffassign
-    - interfacer
+    # - interfacer  # deprecated
     - lll
     - makezero
-    - maligned
+    # - maligned  # deprecated
     - misspell
     - nakedret
     - nestif
+    - nilerr
     - noctx
     - nolintlint
     - paralleltest
     - predeclared
-    - scopelint
+    - revive
+    # - scopelint  # deprecated
     - staticcheck
     - structcheck
     - stylecheck
+    - tagliatelle
     - testpackage
     - thelper
     - tparallel
@@ -69,12 +79,15 @@ linters:
     - unconvert
     - unused
     - varcheck
+    - wastedassign
     - whitespace
   disabled:
+    - durationcheck     # No duration types used
     - gochecknoglobals  # This can sometimes be needed
     - gomnd             # False Positives on length checks
     - nlreturn          # Style; can result in oddly spaced code with single returns
     - prealloc          # Premature optimization; can result in false positives
+    - promlinter        # Prometheus isn't used
     - rowserrcheck      # No DB/SQL in this project
     - sqlclosecheck     # No DB/SQL in this project
     - unparam           # Style; personal preference it to assign names even if not used

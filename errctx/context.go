@@ -16,18 +16,24 @@ func New(handlers ...ErrorHandler) *Context {
 	switch len(handlers) {
 	case 0:
 		return &Context{
-			Path:    mpath.New(mpath.DotNotation{}),
-			Handler: nil,
+			Path:     mpath.New(mpath.DotNotation{}),
+			Handler:  nil,
+			errCount: 0,
+			lastErr:  nil,
 		}
 	case 1:
 		return &Context{
-			Path:    mpath.New(mpath.DotNotation{}),
-			Handler: handlers[0],
+			Path:     mpath.New(mpath.DotNotation{}),
+			Handler:  handlers[0],
+			errCount: 0,
+			lastErr:  nil,
 		}
 	}
 	return &Context{
-		Path:    mpath.New(mpath.DotNotation{}),
-		Handler: &MultiHandler{Handlers: handlers},
+		Path:     mpath.New(mpath.DotNotation{}),
+		Handler:  &MultiHandler{Handlers: handlers},
+		errCount: 0,
+		lastErr:  nil,
 	}
 }
 
