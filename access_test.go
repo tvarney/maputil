@@ -340,6 +340,306 @@ func TestGetStringEnum(t *testing.T) {
 	})
 }
 
+func TestOptionalArray(t *testing.T) {
+	t.Parallel()
+	m := map[string]interface{}{
+		keyGood: testArray,
+		keyBad:  testString,
+	}
+	dv := []interface{}{1, "two", true}
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		a, err := maputil.OptionalArray(d, keyMissing, dv)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, dv, a) // We returned the default value
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		a, err := maputil.OptionalArray(d, keyBad, dv)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Expected: []string{maputil.TypeArray},
+			Actual:   maputil.TypeString,
+		}.Error()) // Error due to type
+		require.Equal(t, dv, a) // We returned the default value
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("Present", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		a, err := maputil.OptionalArray(d, keyGood, dv)
+		require.NoError(t, err)        // No error due to type
+		require.Equal(t, testArray, a) // The returned value is what we expect
+		require.Equal(t, m, d)         // The source map wasn't changed
+	})
+}
+
+func TestOptionalBoolean(t *testing.T) {
+	t.Parallel()
+	m := map[string]interface{}{
+		keyGood: true,
+		keyBad:  testString,
+	}
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		b, err := maputil.OptionalBoolean(d, keyMissing, true)
+		require.NoError(t, err) // No error due to type
+		require.True(t, b)      // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		b, err := maputil.OptionalBoolean(d, keyBad, true)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Expected: []string{maputil.TypeBoolean},
+			Actual:   maputil.TypeString,
+		}.Error()) // Error due to type
+		require.True(t, b)     // The default value was returned
+		require.Equal(t, m, d) // The source map wasn't changed
+	})
+	t.Run("Present", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		b, err := maputil.OptionalBoolean(d, keyGood, false)
+		require.NoError(t, err) // No error due to type
+		require.True(t, b)      // The returned value is what we expect
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+}
+
+func TestOptionalInteger(t *testing.T) {
+	t.Parallel()
+	m := map[string]interface{}{
+		keyGood: testInteger,
+		keyBad:  testString,
+	}
+	const dv int64 = 65536
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		i, err := maputil.OptionalInteger(d, keyMissing, dv)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, dv, i) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		i, err := maputil.OptionalInteger(d, keyBad, dv)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Expected: []string{maputil.TypeInteger},
+			Actual:   maputil.TypeString,
+		}.Error()) // Error due to type
+		require.Equal(t, dv, i) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("Present", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		i, err := maputil.OptionalInteger(d, keyGood, dv)
+		require.NoError(t, err)          // No error due to type
+		require.Equal(t, testInteger, i) // The returned value is what we expect
+		require.Equal(t, m, d)           // The source map wasn't changed
+	})
+}
+
+func TestOptionalNull(t *testing.T) {
+	t.Parallel()
+	m := map[string]interface{}{
+		keyGood: nil,
+		keyBad:  testString,
+	}
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		err := maputil.OptionalNull(d, keyMissing)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		err := maputil.OptionalNull(d, keyBad)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Actual:   maputil.TypeString,
+			Expected: []string{maputil.TypeNull},
+		}.Error()) // Error due to type
+		require.Equal(t, m, d) // The source map wasn't changed
+	})
+	t.Run("Present", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		err := maputil.OptionalNull(d, keyGood)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+}
+
+func TestOptionalNumber(t *testing.T) {
+	t.Parallel()
+	m := map[string]interface{}{
+		keyGood: testNumber,
+		keyBad:  testString,
+	}
+	const dv float64 = 101.3
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		n, err := maputil.OptionalNumber(d, keyMissing, dv)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, dv, n) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		n, err := maputil.OptionalNumber(d, keyBad, dv)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Expected: []string{maputil.TypeNumber},
+			Actual:   maputil.TypeString,
+		}.Error()) // Error due to type
+		require.Equal(t, dv, n) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("Present", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		n, err := maputil.OptionalNumber(d, keyGood, dv)
+		require.NoError(t, err)         // No error due to type
+		require.Equal(t, testNumber, n) // The returned value is what we expect
+		require.Equal(t, m, d)          // The source map wasn't changed
+	})
+}
+
+func TestOptionalObject(t *testing.T) {
+	t.Parallel()
+	m := map[string]interface{}{
+		keyGood: testObject,
+		keyBad:  testString,
+	}
+	dv := map[string]interface{}{
+		"a": "test",
+		"b": "value",
+	}
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		o, err := maputil.OptionalObject(d, keyMissing, dv)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, dv, o) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		o, err := maputil.OptionalObject(d, keyBad, dv)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Expected: []string{maputil.TypeObject},
+			Actual:   maputil.TypeString,
+		}.Error()) // Error due to type
+		require.Equal(t, dv, o) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("Present", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		o, err := maputil.OptionalObject(d, keyGood, dv)
+		require.NoError(t, err)         // No error due to type
+		require.Equal(t, testObject, o) // The returned value is what we expect
+		require.Equal(t, m, d)          // The source map wasn't changed
+	})
+}
+
+func TestOptionalString(t *testing.T) {
+	t.Parallel()
+	m := map[string]interface{}{
+		keyGood: testString,
+		keyBad:  testInteger,
+	}
+	const dv string = "default-value"
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		s, err := maputil.OptionalString(d, keyMissing, dv)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, dv, s) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		s, err := maputil.OptionalString(d, keyBad, dv)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Expected: []string{maputil.TypeString},
+			Actual:   maputil.TypeInteger,
+		}.Error()) // Error due to type
+		require.Equal(t, dv, s) // We returned no value
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("Present", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		s, err := maputil.OptionalString(d, keyGood, dv)
+		require.NoError(t, err)         // No error due to type
+		require.Equal(t, testString, s) // The returned value is what we expect
+		require.Equal(t, m, d)          // The source map wasn't changed
+	})
+}
+
+func TestOptionalStringEnum(t *testing.T) {
+	t.Parallel()
+	const badVal = "four"
+	const goodVal = "two"
+	enum := []string{"one", "two", "three"}
+	m := map[string]interface{}{
+		keyGood:   goodVal,
+		keyBad:    testInteger,
+		keyBadVal: badVal,
+	}
+	const dv = "three"
+	t.Run("Missing", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		s, err := maputil.OptionalStringEnum(d, keyMissing, enum, dv)
+		require.NoError(t, err) // No error due to type
+		require.Equal(t, dv, s) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("InvalidType", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		s, err := maputil.OptionalStringEnum(d, keyBad, enum, dv)
+		require.EqualError(t, err, maputil.InvalidTypeError{
+			Actual:   maputil.TypeInteger,
+			Expected: []string{maputil.TypeString},
+		}.Error()) // Error due to type
+		require.Equal(t, dv, s) // The default value was returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("BadValue", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		s, err := maputil.OptionalStringEnum(d, keyBadVal, enum, dv)
+		require.EqualError(t, err, maputil.EnumStringError{
+			Value: badVal,
+			Enum:  enum,
+		}.Error()) // Error due to value
+		require.Equal(t, dv, s) // The default value is returned
+		require.Equal(t, m, d)  // The source map wasn't changed
+	})
+	t.Run("GoodValue", func(t *testing.T) {
+		t.Parallel()
+		d := maputil.Copy(m)
+		s, err := maputil.OptionalStringEnum(d, keyGood, enum, dv)
+		require.NoError(t, err)      // No error due to type
+		require.Equal(t, goodVal, s) // No value returned
+		require.Equal(t, m, d)       // The source map wasn't changed
+	})
+}
 func TestPopArray(t *testing.T) {
 	t.Parallel()
 	m := map[string]interface{}{

@@ -98,6 +98,122 @@ func GetStringEnum(m map[string]interface{}, key string, values []string) (strin
 	}
 }
 
+// OptionalArray fetches a value from the map and converts it to an array.
+func OptionalArray(m map[string]interface{}, key string, dv []interface{}) ([]interface{}, error) {
+	v, ok := m[key]
+	if !ok {
+		return dv, nil
+	}
+	a, err := AsArray(v)
+	if err != nil {
+		return dv, err
+	}
+	return a, nil
+}
+
+// OptionalBoolean fetches a value from the map and converts it to a boolean.
+func OptionalBoolean(m map[string]interface{}, key string, dv bool) (bool, error) {
+	v, ok := m[key]
+	if !ok {
+		return dv, nil
+	}
+	b, err := AsBoolean(v)
+	if err != nil {
+		return dv, err
+	}
+	return b, nil
+}
+
+// OptionalInteger fetches a value from the map and converts it to an integer.
+func OptionalInteger(m map[string]interface{}, key string, dv int64) (int64, error) {
+	v, ok := m[key]
+	if !ok {
+		return dv, nil
+	}
+	i, err := AsInteger(v)
+	if err != nil {
+		return dv, err
+	}
+	return i, nil
+}
+
+// OptionalNull fetches a value from the map and ensures it was null.
+func OptionalNull(m map[string]interface{}, key string) error {
+	v, ok := m[key]
+	if !ok {
+		return nil
+	}
+	if v != nil {
+		return InvalidTypeError{
+			Expected: []string{TypeNull},
+			Actual:   TypeName(v),
+		}
+	}
+	return nil
+}
+
+// OptionalNumber fetches a value from the map and converts it to a number.
+func OptionalNumber(m map[string]interface{}, key string, dv float64) (float64, error) {
+	v, ok := m[key]
+	if !ok {
+		return dv, nil
+	}
+	n, err := AsNumber(v)
+	if err != nil {
+		return dv, err
+	}
+	return n, nil
+}
+
+// OptionalObject fetches a value from the map and converts it to an object.
+func OptionalObject(m map[string]interface{}, key string, dv map[string]interface{}) (map[string]interface{}, error) {
+	v, ok := m[key]
+	if !ok {
+		return dv, nil
+	}
+	o, err := AsObject(v)
+	if err != nil {
+		return dv, err
+	}
+	return o, nil
+}
+
+// OptionalString fetches a value from the map and converts it to a string.
+func OptionalString(m map[string]interface{}, key, dv string) (string, error) {
+	v, ok := m[key]
+	if !ok {
+		return dv, nil
+	}
+	s, err := AsString(v)
+	if err != nil {
+		return dv, err
+	}
+	return s, nil
+}
+
+// GetStringEnum fetches a value from the map, converts it to a string, and
+// ensures it is one of the given values.
+func OptionalStringEnum(m map[string]interface{}, key string, values []string, dv string) (string, error) {
+	v, ok := m[key]
+	if !ok {
+		return dv, nil
+	}
+	s, err := AsString(v)
+	if err != nil {
+		return dv, err
+	}
+
+	for _, v := range values {
+		if v == s {
+			return s, nil
+		}
+	}
+	return dv, EnumStringError{
+		Value: s,
+		Enum:  values,
+	}
+}
+
 // PopArray fetches a value from the map and converts it to an array.
 func PopArray(m map[string]interface{}, key string) ([]interface{}, bool, error) {
 	v, ok := m[key]

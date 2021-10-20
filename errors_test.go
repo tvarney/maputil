@@ -132,3 +132,21 @@ func TestEnumStringError(t *testing.T) {
 		require.True(t, errors.Is(maputil.EnumStringError{}, maputil.ErrInvalidValue))
 	})
 }
+
+func TestMissingRequiredValueError(t *testing.T) {
+	t.Parallel()
+	t.Run("Error", func(t *testing.T) {
+		t.Parallel()
+		e := maputil.MissingRequiredValueError{
+			Key: "one",
+		}
+		require.Equal(
+			t, string(maputil.ErrMissingRequiredValue)+` "one"`,
+			e.Error(),
+		)
+	})
+	t.Run("Unwrap", func(t *testing.T) {
+		t.Parallel()
+		require.True(t, errors.Is(maputil.MissingRequiredValueError{}, maputil.ErrMissingRequiredValue))
+	})
+}
