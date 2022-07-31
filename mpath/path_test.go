@@ -120,7 +120,16 @@ func TestPath(t *testing.T) {
 	})
 	t.Run("String", func(t *testing.T) {
 		t.Parallel()
-		p := mpath.New(dn, mpath.Key("one"), mpath.Index(2))
-		require.Equal(t, "one[2]", p.String())
+		t.Run("NoFile", func(t *testing.T) {
+			t.Parallel()
+			p := mpath.New(dn, mpath.Key("one"), mpath.Index(2))
+			require.Equal(t, "one[2]", p.String())
+		})
+		t.Run("WithFile", func(t *testing.T) {
+			t.Parallel()
+			p := mpath.New(dn, mpath.Key("one"), mpath.Index(2))
+			p.Filename = "file.json"
+			require.Equal(t, "file.json: one[2]", p.String())
+		})
 	})
 }

@@ -2,6 +2,7 @@ package mpath
 
 // Path is a collection of path elements and an output style.
 type Path struct {
+	Filename string
 	Elements []Element
 	Style    PathStyle
 }
@@ -67,6 +68,7 @@ func (p *Path) Copy() *Path {
 		elements = append(elements, e.Copy())
 	}
 	return &Path{
+		Filename: p.Filename,
 		Elements: elements,
 		Style:    p.Style,
 	}
@@ -74,5 +76,8 @@ func (p *Path) Copy() *Path {
 
 // String returns the string representation of this path.
 func (p *Path) String() string {
+	if p.Filename != "" {
+		return p.Filename + ": " + p.Style.Format(p.Elements)
+	}
 	return p.Style.Format(p.Elements)
 }
